@@ -37,7 +37,7 @@
 ---
 
 ## 遊び方（最低限）
-1. サイトを開く （https://whatrune.github.io/sea-bunny-arg/） 
+1. サイトを開く （[https://whatrune.github.io/sea-bunny-arg/](https://whatrune.github.io/sea-bunny-arg/)） 
 2. 検索欄に **キーワード** を入力  
 3. 一覧から資料を選んで読む  
 4. 次のキーワードが見つかったら、また検索する
