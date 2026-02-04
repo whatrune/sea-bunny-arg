@@ -1,0 +1,976 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Sea&Bunny — Archive</title>
+  <style>
+    :root{
+      --bg:#0b0f14; --panel:#111827; --panel2:#0f172a;
+      --text:#e5e7eb; --muted:#94a3b8; --line:#1f2937;
+      --accent:#60a5fa; --ok:#34d399;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic", sans-serif;
+      background: radial-gradient(1200px 700px at 20% 0%, #0f1a2e 0%, var(--bg) 55%, #070a0e 100%);
+      color:var(--text);
+    }
+    header{padding:28px 18px 10px; max-width:980px; margin:0 auto;}
+    .brand{display:flex; align-items:baseline; gap:12px; flex-wrap:wrap;}
+    .brand h1{margin:0; font-size:18px; letter-spacing:.06em; font-weight:700;}
+    .brand span{color:var(--muted); font-size:12px;}
+
+    main{
+      max-width:980px; margin:0 auto; padding:12px 18px 64px;
+      display:grid; grid-template-columns: 360px 1fr; gap:14px;
+    }
+    @media (max-width: 900px){ main{grid-template-columns:1fr} }
+
+    .card{
+      background: linear-gradient(180deg, rgba(17,24,39,.92), rgba(15,23,42,.86));
+      border:1px solid rgba(31,41,55,.85);
+      border-radius:14px;
+      overflow:hidden;
+      box-shadow: 0 12px 30px rgba(0,0,0,.35);
+    }
+    .card .hd{
+      padding:14px 14px 10px;
+      border-bottom:1px solid rgba(31,41,55,.85);
+      display:flex; justify-content:space-between; align-items:center; gap:10px;
+    }
+    .card .hd .ttl{
+      font-size:13px; letter-spacing:.08em; color:var(--muted);
+      text-transform:uppercase;
+      display:flex; gap:10px; align-items:center; flex-wrap:wrap;
+    }
+    .pill{
+      font-size:11px; color:var(--muted);
+      border:1px solid rgba(31,41,55,.85);
+      padding:4px 8px; border-radius:999px;
+      background: rgba(2,6,23,.35);
+      white-space:nowrap;
+    }
+    .body{ padding:14px; }
+    .searchBox{display:flex; gap:8px; align-items:center;}
+    input[type="text"]{
+      width:100%;
+      background: rgba(2,6,23,.55);
+      border:1px solid rgba(31,41,55,.95);
+      color:var(--text);
+      padding:12px 12px;
+      border-radius:12px;
+      outline:none;
+      font-size:14px;
+    }
+    input[type="text"]::placeholder{color: rgba(148,163,184,.7)}
+    button{
+      background: rgba(96,165,250,.18);
+      color: var(--text);
+      border:1px solid rgba(96,165,250,.45);
+      padding:11px 12px;
+      border-radius:12px;
+      cursor:pointer;
+      font-weight:600;
+      font-size:13px;
+      white-space:nowrap;
+    }
+    button:hover{background: rgba(96,165,250,.24)}
+    .btnGhost{
+      background: rgba(2,6,23,.35);
+      border:1px solid rgba(31,41,55,.85);
+      color: rgba(203,213,225,.9);
+    }
+    .btnGhost:hover{border-color: rgba(96,165,250,.35)}
+    .muted{color:var(--muted); font-size:12px; line-height:1.55}
+    .list{display:flex; flex-direction:column; gap:10px; margin-top:12px;}
+    .item{
+      border:1px solid rgba(31,41,55,.85);
+      background: rgba(2,6,23,.35);
+      border-radius:12px;
+      padding:10px 10px;
+      cursor:pointer;
+      transition: transform .08s ease, border-color .08s ease;
+    }
+    .item:hover{transform: translateY(-1px); border-color: rgba(96,165,250,.45);}
+    .item .top{display:flex; justify-content:space-between; gap:10px; align-items:flex-start;}
+    .id{font-weight:800; letter-spacing:.05em; font-size:12px; color: rgba(229,231,235,.95);}
+    .kw{font-size:11px; color: var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:190px;}
+    .title{margin-top:6px; font-size:13px; color: rgba(229,231,235,.95); line-height:1.35;}
+    .badge{
+      font-size:10px; padding:3px 8px; border-radius:999px;
+      border:1px solid rgba(31,41,55,.85);
+      color: var(--muted); background: rgba(2,6,23,.35);
+      flex: 0 0 auto;
+    }
+    .badge.ex{ border-color: rgba(52,211,153,.35); color: rgba(167,243,208,.9); }
+    .badge.main{ border-color: rgba(96,165,250,.35); color: rgba(191,219,254,.9); }
+
+    .docTitle{font-size:18px; margin:0 0 4px; letter-spacing:.02em;}
+    .docMeta{display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin:0 0 14px;}
+    .docMeta .meta{
+      font-size:11px; color: var(--muted);
+      border:1px solid rgba(31,41,55,.85);
+      padding:4px 8px; border-radius:999px;
+      background: rgba(2,6,23,.35);
+      white-space:nowrap;
+    }
+    .doc{
+      white-space:pre-wrap;
+      line-height:1.75;
+      font-size:14px;
+      color: rgba(229,231,235,.95);
+    }
+    .empty{
+      padding:12px;
+      border:1px dashed rgba(148,163,184,.35);
+      border-radius:12px;
+      color: var(--muted);
+      background: rgba(2,6,23,.22);
+      font-size:12px;
+      line-height:1.7;
+    }
+    .foot{margin-top:12px; font-size:11px; color: rgba(148,163,184,.75);}
+    .hint{
+      margin-top:12px;
+      border-left: 3px solid rgba(96,165,250,.45);
+      padding:10px 12px;
+      background: rgba(2,6,23,.28);
+      border-radius:10px;
+      color: rgba(203,213,225,.9);
+      font-size:12px;
+      line-height:1.65;
+    }
+    kbd{
+      background: rgba(2,6,23,.55);
+      border:1px solid rgba(31,41,55,.85);
+      padding:2px 6px;
+      border-radius:6px;
+      font-size:11px;
+      color: rgba(229,231,235,.92);
+    }
+
+    /* history */
+    .histHd{display:flex; justify-content:space-between; align-items:center; gap:10px;}
+    .histList{display:flex; flex-direction:column; gap:8px; margin-top:10px;}
+    .histItem{
+      border:1px solid rgba(31,41,55,.85);
+      background: rgba(2,6,23,.35);
+      border-radius:12px;
+      padding:9px 10px;
+      cursor:pointer;
+    }
+    .histItem:hover{border-color: rgba(96,165,250,.45)}
+    .histTop{display:flex; justify-content:space-between; gap:10px;}
+    .histWhen{font-size:10px; color: rgba(148,163,184,.8); white-space:nowrap;}
+    .small{font-size:11px; color: rgba(148,163,184,.9)}
+  </style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <h1>Sea&Bunny — Archive</h1>
+    <span>（内部資料・検索で閲覧）</span>
+  </div>
+</header>
+
+<main>
+  <!-- Left: search / results / history -->
+  <section class="card">
+    <div class="hd">
+      <div class="ttl">
+        <span>Search</span>
+        <span class="pill" id="countPill">MAIN 0 / 0 ・EX 0 / 0</span>
+      </div>
+      <div class="pill">一致したページを表示</div>
+    </div>
+
+    <div class="body">
+      <div class="searchBox">
+        <input id="q" type="text" placeholder="キーワードを入力…" autocomplete="off" />
+        <button id="btn">検索</button>
+      </div>
+
+      <div class="hint">
+        例：<kbd>依頼</kbd>
+      </div>
+
+      <div id="status" class="foot"></div>
+      <div id="results" class="list"></div>
+
+      <div style="margin-top:16px;"></div>
+
+      <div class="histHd">
+        <div class="pill">閲覧履歴（端末に保存）</div>
+        <button class="btnGhost" id="clearHist">履歴クリア</button>
+      </div>
+      <div id="history" class="histList"></div>
+      <div class="foot">※履歴はこのブラウザの localStorage に保存されます（GitHubには送られません）。</div>
+    </div>
+  </section>
+
+  <!-- Right: document viewer -->
+  <section class="card">
+    <div class="hd">
+      <div class="ttl">
+        <span>Document</span>
+        <span class="pill" id="posPill">未選択</span>
+      </div>
+      <div class="pill" id="viewPill">未選択</div>
+    </div>
+    <div class="body" id="viewer">
+      <div class="empty">
+        左の検索からページを開いてください。<br/>
+        キーワードが一致すると、該当ページの一覧が出ます。
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+/**
+ * 追加機能：
+ * - ページ番号/母数：
+ *    MAIN: 例) 12 / 28
+ *    EX:   例) EX 1 / 9 （EX1を開いた時）
+ * - 閲覧履歴：
+ *    localStorage に [ {id, at} ] を保存。最新20件。
+ */
+const STORAGE_KEY = "seabunny_history_v1";
+const HISTORY_MAX = 20;
+
+const PAGES = [
+  // ※ここは前に作った PAGES をそのまま貼ってOK（省略せず入れてね）
+  // --- 例として下に「あなたの現状PAGES」を入れてあります（このまま動きます） ---
+  // ===== Main =====
+  { id:"1", type:"main", title:"依頼文", keywords:["依頼"], body:`Sea&Bunnyの関係者向けに、内々でお願いがあります。
+外には出さないでください。誰の正義も、先に決めないでください。
+
+ぺろさんの件は「事故」で処理されました。
+そう扱うのが一番早く、静かです。
+でも、静かすぎる夜がありました。
+
+私は、納得していません。
+ただ、私は私の言葉を信用していない。
+だから資料だけ残します。
+
+あなたのやり方で、見てください。
+答え合わせは、しません。`},
+  { id:"2", type:"main", title:"事故取扱い（写）", keywords:["資料"], body:`【取扱注意】資料（写）
+件名：＊＊事案　取扱い概要（抜粋）
+作成：＊＊署　＊＊課
+日付：令和＊＊年＊＊月＊＊日
+
+- 発生：令和＊＊年＊＊月＊＊日 深夜
+- 場所：＊＊区＊＊　2階テラス相当
+- 被害者：望月＊＊（通称：ぺろ）
+- 概要：高所からの転落。第三者関与を示す直接証拠なし
+- 取扱：事故（詳細省略）
+
+※固有名詞・地番等は写し作成時に伏せ`},
+  { id:"3", type:"main", title:"建物案内", keywords:["Sea&Bunny"], body:`Sea&Beluga / Sea&Bunny　建物メモ（簡易）
+
+- 1F：Sea&Beluga（カーディーラー／事務スペース・レジあり）
+- 2F：Sea&Bunny（飲食）
+- 2F：海が見えるテラス（客席として使用）
+- 2F：予約席あり（窓側・店内奥）
+
+導線
+- 1F入口 → 階段 → 2Fホール → テラス
+- テラス中央付近に“よく人が寄る場所”がある
+（スタッフ内では「定位置」と呼ぶ）`},
+  { id:"4", type:"main", title:"予約台帳（抜粋）", keywords:["予約席"], body:`予約台帳（抜粋）／Sea&Bunny
+※個人情報は伏せ
+
+- ＊＊/＊＊　19:00　2名　「窓側希望」
+- ＊＊/＊＊　19:30　4名　「誕生日。静かに」
+- ＊＊/＊＊　20:00　2名　「初めて。海が見たい」
+- ＊＊/＊＊　20:30　6名　「遅れるかも」
+- ＊＊/＊＊　21:00　2名　「テラスは風が強いなら中で」
+
+※キャンセル理由は書かない（気持ちが残るから）`},
+  { id:"5", type:"main", title:"定位置", keywords:["定位置"], body:`ぺろさんは、閉店後の最後に必ずテラスへ出た。
+戸締りの流れの中に、その時間が組み込まれていた。
+
+決まった場所がある。
+中央付近。身体を預けて、煙草を吸う。
+
+毎晩、同じ動き。
+同じ場所。
+同じ癖。
+
+癖は、守りにもなる。
+癖は、狙われる。`},
+  { id:"6", type:"main", title:"順番", keywords:["同じ癖"], body:`この件で最初に見るべきは、人ではない。
+その夜にいた・いないの話は、後でいい。
+
+先に、形のあるものを詰める。
+
+- いつから手すりは“危険”だったのか
+- それは自然な劣化なのか、誰かの手なのか
+- 記録は何を残して、何を残していないのか
+
+順番を間違えると、楽な答えに吸い寄せられる。
+私は、その楽さが嫌いだ。
+
+次は、音から始める。`},
+  { id:"7", type:"main", title:"閉店前の海", keywords:["海"], body:`閉店前の海は、昼よりうるさい。
+光が減る分、音が増える。
+
+店の中にいると、海の音は壁の向こうにある。
+テラスに出ると、壁がなくなる。
+
+それだけの違いなのに、距離が一気に縮まった気がする。
+
+今日は、風が強い。
+海が近い日だ。`},
+  { id:"8", type:"main", title:"聴取メモ（抜粋）／遥月 凪紗", keywords:["音"], body:`資料：聴取メモ（抜粋）／遥月 凪紗
+※事故発生「その瞬間」の目撃ではなく、Beluga側での状況と時刻感
+
+- 当夜、Belugaで帰宅準備の途中、建物内で大きい音（1回）を聞いた。
+- びっくりして、音のした方へ身体が向いた。その途中で、視界の端にレジ表示が入った。
+- 22:24くらいだったと思う。
+  ただ、音の方を見ていたので“見た”というより“入った”に近い。
+  秒はもちろん、分も自信はない（20分台だった、くらい）。
+
+追記：音の直後、頭に浮かんだのはテラスだった。
+前から「揺れる」と言われていたのを思い出した。`},
+  { id:"9", type:"main", title:"対応メモ（テラス）／修繕要望・保留", keywords:["手すり"], body:`対応メモ（テラス）／修繕要望・保留
+作成：七瀬（ホール責任者）　共有先：2Fスタッフ
+
+概要
+- テラス中央付近について、揺れが気になるという声が継続。
+- ぺろさんが戸締りの最後に身体を預ける場所でもあるため、優先度は高い。
+
+現場の困りごと
+- 夜：暗い＋風で足元も手元も見えづらい
+- 雨上がり：床が湿ってる
+- 客：景色見に寄る（テンション上がって寄りかかる）
+
+相談（結果）
+- 修繕の話は出した。
+- ただ、今月は新規の動きが多く、すぐには動けないとのこと。
+
+暫定対応
+- 強風の日はテラス案内を控える
+- 中央付近はスタッフが声かけ
+- 気づいた揺れ・異音はその場でメモ（写真も）
+
+注意
+- 固定部（根元の金具／ボルト）には触らない
+- 面白がって試さない
+
+追記（七瀬）
+言い方きつくなるけど、これは“ちゃんと怖がる”案件。`},
+  { id:"10", type:"main", title:"テラスのお願い（貼り紙）", keywords:["手すり"], body:`お願い（テラス）
+
+- 走らない
+- 手すりに乗らない／ぶら下がらない
+- 強風の日はスタッフの案内に従ってください
+- 海側、足元が濡れやすいです
+
+※景色は逃げません
+※足元は逃げます
+
+（Sea&Bunny）`},
+  { id:"11", type:"main", title:"現場ログ（簡易）", keywords:["異音","現場ログ"], body:`現場ログ（簡易）／揺れ・異音
+注意：固定部には触らない。確認は“上から軽く”のみ。
+
+ルール
+- 揺れ：0（なし）/ 1（気になる）/ 2（はっきり分かる）
+- 異音：なし / あり（「キュ」「カタ」等）
+- 場所：A（入口寄り）/ B（中央付近）/ C（端部寄り）
+
+ログ（抜粋)
+| 日付 | 時間帯 | 天候/風 | 場所 | 揺れ | 異音 | メモ |
+|---|---|---|---|---:|---|---|
+| ＊＊/＊＊ | 夕方 | 晴/風弱 | B | 1 | なし | 客が寄りかかった時に少しだけ |
+| ＊＊/＊＊ | 夜 | 曇/風中 | B | 2 | 「カタ」 | 揺れが分かる。暗いと余計怖い |
+| ＊＊/＊＊ | 夜 | 雨上がり/風弱 | A | 0 | なし | Aは問題なし |
+| ＊＊/＊＊ | 夜 | 晴/風強 | B | 2 | 「キュ」 | 風の日はBが目立つ。注意喚起した |
+| ＊＊/＊＊ | 閉店後 | 曇/風中 | B | 2 | なし | 中央付近。触った人：＿＿（手袋の箱だけ開いてた）（落とし物あり：カウンター下） |`},
+  { id:"12", type:"main", title:"落とし物", keywords:["落とし物"], body:`落とし物一覧（保管：カウンター下）
+
+- イヤホン片方（白）
+- 鍵（小さいキーホルダー付き）
+- 手袋（片方。黒）
+- うさぎのストラップ
+- レシート（名前のないやつ）
+- しゃぼん柄のメモ帳（数ページちぎれ）
+
+※大体、戻ってこない
+※戻ってこないのに、捨てられない
+
+……落とし物の箱の下、備品の控えも一緒に突っ込まれてる。`},
+  { id:"13", type:"main", title:"備品", keywords:["備品"], body:`備品管理（規定）
+
+- マット（入口）…ズレたら戻す
+- 傘立て …倒れたら起こす
+- 使い捨て手袋 …残数見る
+- ペン …戻す（戻らない）
+- 消毒 …補充
+- ゴミ袋 …買う
+- 棚卸 …終業前にチェック
+- 予備の鍵 …触らない（“予備”の意味がなくなる）
+
+「触った」は記録しない。
+記録しない方が、揉めないことがある。
+
+……予備の鍵って、結局「誰が持ってるか」なんだよな。`},
+  { id:"14", type:"main", title:"規程", keywords:["規程"], body:`（茉陽のメモ）
+
+規程は、嫌われるためにある。
+守る人が嫌われて、破る人が笑う。
+
+それでも残すのは、
+事故が起きたあとに「決めてなかった」を言いたくないから。
+
+凪紗は、規程を増やす。
+増やしたいわけじゃない。
+増やさないと、また誰かが傷つくから。`},
+  { id:"15", type:"main", title:"棚卸", keywords:["棚卸"], body:`棚卸チェック（抜粋）／Beluga
+
+- 工具：番号で戻す
+- 伝票：日付で束ねる
+- レジ：締め確認
+- 売上：ズレ確認
+- 鍵：所定位置へ
+- 例外：作らない（例外が増えると事故が増える）
+
+終業は「帰った人」じゃなく、
+「終わらせた人」が決める。`},
+  { id:"16", type:"main", title:"鍵", keywords:["鍵"], body:`（七瀬のメモ）
+
+鍵って、音がしないように持てる。
+慣れると、どこに当てると鳴るか分かる。
+
+ここは店だ。
+鍵は店のもの。
+持ち歩く理由なんてない。
+
+でも、持ち歩く人はいる。
+「失くしたら困るから」って言って。
+
+で、実際に失くした。
+誰かが。
+
+決めた。
+失くしたやつは、反省文。
+書けば終わるって思うなら、書いて終われ。`},
+  { id:"17", type:"main", title:"反省文（加那）", keywords:["反省文"], body:`（加那のメモ）
+
+反省文って、書けば終わる。
+終わったことにできる。
+
+でも、書く内容を選べば、
+終わらせたくない部分だけ残る。
+
+「もうしません」って書くのは簡単。
+「何をしたか」を書くのは、むずい。
+
+上手い反省文ほど、怖い。`},
+  { id:"18", type:"main", title:"使い古されたしゃぼん柄のメモ帳", keywords:["しゃぼん柄のメモ帳"], body:`落とし物の箱に、使い古されたしゃぼん柄のメモ帳があった。
+角が丸くなってて、手の汗の跡が残ってる。
+
+数ページ、ちぎれてる。
+ちぎり跡が、雑。
+
+これだけだと、足りない。`},
+  { id:"19", type:"main", title:"現場ログ（追記あり）", keywords:["現場ログ"], body:`現場ログ（追記あり）／揺れ記録
+備考：一部に後日追記がある（記入者未確定）
+
+該当箇所
+| 日付 | 時間帯 | 天候/風 | 場所 | 揺れ | 異音 | メモ |
+|---|---|---|---|---:|---|---|
+| ＊＊/＊＊ | 閉店後 | 曇/風中 | B | 2 | なし | 中央付近。触った人：＿＿ |
+
+追記（同ページ下部）
+- 触った人 → 陽夏
+- 「上から軽く。揺れ2。修繕した方がいいっすよ〜」
+
+さらに追記（別筆跡）
+- 「野月、覗いたっぽい」`},
+  { id:"20", type:"main", title:"くしゃくしゃに丸められたメモ", keywords:["陽夏"], body:`タイトル：テラスの手すり（B）
+
+七瀬さんのログ見た。
+B、やっぱ揺れてる扱いなんすねぇ。
+（俺だけが神経質ってわけじゃなかったのは、ちょい安心した）
+
+ぺろさん、あそこ毎晩もたれるじゃないっすかぁ。
+癖っていうか、儀式みたいなやつ。
+だから余計、放置は無理っすよ〜。
+
+「直す」って言っても、先送りされるの目に見えてる。
+新規事業の話ばっかで、現場の“今”は後回し。
+分かるけど、分かっても困るっす。`},
+  { id:"21", type:"main", title:"野月うさぎの迷子報告", keywords:["野月"], body:`連絡メモ（抜粋）／野月うさぎの所在
+
+件名：野月うさぎがいません
+- 最後に見た場所：1Fの工具棚のあたり
+- 最後に聞いた言葉：「ちょっと外、見てきますわ」
+- 戻ってくる予定：本人は「すぐ」
+
+追記
+見つかったら、叱る係は、ぺろさん。
+慰める係は、茉陽。`},
+  { id:"22", type:"main", title:"まかない（茉陽）", keywords:["茉陽"], body:`（茉陽のメモ）
+
+今日のまかない、スープ多め。
+風強い日は、あったかいのが正義やねん。
+
+陽夏が「それ、眠くなるやつっすかぁ」って言うから、
+「今日は寝てもええ日や」って返した。
+
+忙しい日は、みんな黙る。
+黙ると、店がちょっとだけ怖くなる。
+
+だから茉陽は、どうでもいい話を混ぜる。
+混ぜると、空気がほどけるから。`},
+  { id:"23", type:"main", title:"しゃぼん（茉陽）", keywords:["茉陽"], body:`（茉陽のメモ）
+
+しゃぼん玉って、すぐ消えるやろ。
+消えるのに、見たくなるの、ずるい。
+
+陽夏のしゃぼんは、ちょっと変やねん。
+“落ち着く”って言う人がいて、
+最初は「ほんまかいな」って思った。
+
+でも、ほんまっぽい。
+落ち着くって、たぶん、
+「息を吐ける」ってことや。
+
+息を吐ける場所、減ってるからな。
+この店も、減らしたくない。
+
+あ、参式さんが来てくれはった。`},
+  { id:"24", type:"main", title:"格ゲー（参式）", keywords:["参式"], body:`（老月 参式のメモ）
+
+毎日、車の点検をしている。
+同じ手順を繰り返すと、違いだけが残る。
+
+最近、格ゲーをやってる。
+勝つと気分が良い。負けると静かになる。
+
+仕事も同じだ。
+上手くいく日は、音が少ない。
+上手くいかない日は、音が増える。
+
+音が増える日は、
+誰かがどこかで無理をしてる。`},
+  { id:"25", type:"main", title:"点検（参式）", keywords:["点検"], body:`点検ログ（抜粋）／老月 参式
+
+- レンチ：欠品なし
+- トルクレンチ：校正期限 ＊＊/＊＊
+- グリス：残量 3
+- 手袋：減り早い（理由不明）
+- マット：ズレる（入口）
+- 傘立て：倒れやすい（風）
+
+事故は、壊れた時じゃない。
+「壊れてるのに慣れた時」に起きる。`},
+  { id:"26", type:"main", title:"メモ（抜粋）加那", keywords:["加那"], body:`書いた人：那月 華那（※本人申告）
+備考：内容の真偽は不明。読み物として残す。
+
+俺、こういうの得意なんだよな。
+“見られて困るやつ”を、見られない場所にしまうの。
+
+前もそうだった。
+コンビニの時も、最初にやったのはそれ。
+怖い？　別に。楽しかったって言ったのは本当。
+
+でも、ここは違う。
+ぺろさんは、首にしなかった。
+温情ってやつ。重い。
+
+だから、余計に分かんない。
+この店で“普通”をやれって言われるのが、一番むずい。`},
+  { id:"27", type:"main", title:"（写し）陽夏メモ（完全版）", keywords:["くしゃくしゃに丸められたメモ しゃぼん柄のメモ帳"], body:`タイトル：テラスの手すり（B）
+
+七瀬さんのログ見た。
+B、やっぱ揺れてる扱いなんすねぇ。
+（俺だけが神経質ってわけじゃなかったのは、ちょい安心した）
+
+ぺろさん、あそこ毎晩もたれるじゃないっすかぁ。
+癖っていうか、儀式みたいなやつ。
+だから余計、放置は無理っすよ〜。
+
+「直す」って言っても、先送りされるの目に見えてる。
+新規事業の話ばっかで、現場の“今”は後回し。
+分かるけど、分かっても困るっす。
+
+色々掛け合ってやっとできたリラックスするシャボン玉の売上を次の事業に回すって言われたのも、まだ引っかかってる。
+店の金なのは分かるっすよ。
+……でも、じゃあ俺が作った時間って何なんすかぁ、ってなるっす。
+
+目的
+「危ない」って言うだけだと、通らない。
+言葉って、都合よく薄まるじゃないっすかぁ。
+だから、薄まらない形にしたい。
+
+やること（自分用）
+・“見れば分かる”状態に寄せる
+・でも、壊さない
+・戻せる範囲で止める
+・“気づかれるべき人にだけ”気づかせる
+
+……書いてて最悪っすねぇ。
+
+言い訳（自分に向けて）
+俺は、店を守りたいだけっす。
+ぺろさんを責めたいわけじゃない。
+でも、勢いで走る人って止まらないじゃないっすかぁ。
+
+「守りたい」って言いながら、
+結局、俺が楽になりたいだけかも。
+
+ルール（ここだけは守る）
+・夜はやらない（暗い／余計に怪しまれる）
+・人がいる時はやらない
+・“定位置”の前では、絶対に
+
+……守れよ、俺。`},
+  { id:"28", type:"main", title:"犯人は陽夏", keywords:["守りたい"], body:`結論だけは、出せる。
+揺れは偶然じゃない。
+記録が残っている。追記も残っている。
+
+そして、陽夏のメモが残っている。
+言葉は、言い訳として成立する。
+成立するから、厄介だ。
+
+“危険に見える”ようになった。
+それが目的だったはずなのに、
+危険は、見えるだけじゃ終わらなかった。
+
+ぺろさんは落ちた。
+落ちた瞬間を見た人はいない。
+見た人がいないのに、理由だけが残る。
+
+ここで一度、終わったことにできる。
+でも、胸の奥に小さな違和感だけが残る。
+
+これで事件は終わる。
+——終わったことにできる。`},
+
+  // ===== EX =====
+  { id:"EX1", type:"ex", title:"違和感", keywords:["違和感"], body:`揺れの話は、分かりやすい。
+触った人がいて、触った記録がある。
+
+分かりやすいものは、分かりやすいまま終わらせられる。
+だから人は安心する。
+
+でも、安心の仕方が雑だと、次も同じことが起きる。
+私は、ひとつだけ雑にしたくない。
+
+あの夜の、時間の使われ方。
+「いつ起きたのか」じゃなくて、
+「起きてから、いつ呼んだのか」。
+
+その差は、数字になる。
+数字は、黙って残る。`},
+  { id:"EX2", type:"ex", title:"New Gate", keywords:["違和感"], body:`陽夏が犯人で終われる人は、終わっていい。
+でも、終われない人のために、ここを置く。
+
+ここからは「犯人当て」じゃない。
+“空白”の幅を測るだけ。
+
+検索欄に、次を入れて。
+始まりの終わり`},
+  { id:"EX3", type:"ex", title:"日計（レジ時刻遅れ）", keywords:["始まりの終わり"], body:`資料：Sea&Beluga 日計レシート（写）
+備考：レジ機器の印字時刻。手書き追記なし。
+
+- 帳票：日計（締め）
+- 印字時刻：21:54
+
+備考（機器時刻）
+- 当該レジ機器の表示時刻は、当時 実時刻より約15分遅れていた
+- 調整はされていなかった（理由は不明）
+
+※ズレは「証明」じゃなく「前提」扱いでよい。
+※前提にすると、空白が見える。`},
+  { id:"EX4", type:"ex", title:"痕跡メモ（断片）", keywords:["始まりの終わり"], body:`断片メモ（写）／当夜の行動に関する痕跡
+単体では薄い。並べると形になる。
+
+- 施錠確認の手書き控え：22:10（精度保証なし）
+- 事務スペース：一度消灯されている（非常灯は点灯）
+- 入口マット：わずかにズレ
+- 傘立て：倒れかけ（当夜、風が強い）
+- 机上：建物名の走り書き（筆圧強め）
+
+“よくある”に見える範囲だけが、きれいに残っている。`},
+  { id:"EX5", type:"ex", title:"911記録（写）", keywords:["通報"], body:`【取扱注意】部外秘（写）
+件名：救急要請に係る記録（抜粋）（写）
+
+- 受信日時：令和＊＊年＊＊月＊＊日　23:39（指令時計）
+- 通報者：女性（氏名申告あり／写しでは伏せ）
+- 通報内容：高所からの転落／意識不明の可能性
+- 出動：救急隊出動（詳細略）
+
+※時刻は指令時計に準拠（基準）`},
+  { id:"EX6", type:"ex", title:"第一発見者（聴取抜粋）", keywords:["始まりの終わり"], body:`聴取メモ（抜粋）／第一発見者申告内容
+対象：遥月 凪紗（要旨）
+
+- 「救急要請（911）は私が行った」
+- 「通報時は、何が起こったのか分からなかった」
+- 「落下の瞬間は見ていない」
+- 「建物内の他者在館は把握していない」
+- 「Beluga側は、締めを終えて帰宅準備の途中だった」
+
+メモ：
+「分からなかった」と述べる一方で、通報内容は要点が揃っている。`},
+  { id:"EX7", type:"ex", title:"通報内容（要旨）", keywords:["911"], body:`指令記録（要旨）／通報内容の整理
+
+- 「高所からの転落」
+- 「意識不明の可能性」
+- 「呼びかけに反応がない（ように見える）」
+- 「出血は確認できない（分からない）」
+- 「今すぐ来てほしい」
+
+言葉が揃いすぎる時、
+人は「落ち着いてた」と言う。
+
+落ち着いてたのか、
+落ち着かせたのか。`},
+  { id:"EX8", type:"ex", title:"語彙（揃い方）", keywords:["911"], body:`聴取メモ（抜粋）／語彙の一致
+
+指令記録（要旨）と、本人申告の語彙がよく一致している。
+一致は悪いことじゃない。
+ただ、偶然か、補正か、意図かは分からない。
+
+分からないことが分かった、という記録だけが残る。
+残るから、次に進める。`},
+  { id:"EX9", type:"ex", title:"おわり", keywords:["60","60分"], body:`資料は、揃っている。
+揃ってしまったものは、なかったことにはできない。
+
+陽夏の手は、見える。
+手すりを“危険に見せる”ために触った。
+その動機も、言葉になって残っている。
+
+でも、違和感は消えない。
+見えるものが揃うほど、見えないものが目立つ。
+
+あの夜、私は音を聞いた。
+上じゃない。下だ。
+建物の外壁側――海に近い方へ、反射的に身体が向いた。
+
+そこに、ぺろさんがいた。
+まだ息があった。
+
+呼べばよかった。
+その場で、911を押せばよかった。
+私は押さなかった。
+
+私は、救うべきものを救わなかった。
+「何が起こったのか分からなかった」と言って、
+分かっていた部分を隠した。
+
+空白は、数字になる。
+私が作った空白は、短くない。
+“待てる”時間として扱ってしまった。
+
+言い訳はできる。
+怖かった。混乱していた。自分を守りたかった。
+それでも、結果は同じだ。
+
+落ちたことが罪なら、
+見殺しにしたことも罪だ。
+
+だから、置いていく。
+この記録を。
+この違和感を。
+あなたが、終わらせ方を選べるように。`},
+];
+
+const $ = (sel) => document.querySelector(sel);
+const q = $("#q");
+const btn = $("#btn");
+const results = $("#results");
+const status = $("#status");
+const viewer = $("#viewer");
+const viewPill = $("#viewPill");
+const posPill = $("#posPill");
+const countPill = $("#countPill");
+const historyEl = $("#history");
+const clearHistBtn = $("#clearHist");
+
+function normalize(s){ return (s ?? "").trim(); }
+
+const MAIN_PAGES = PAGES.filter(p => p.type === "main").slice().sort((a,b)=>parseInt(a.id,10)-parseInt(b.id,10));
+const EX_PAGES = PAGES.filter(p => p.type === "ex").slice().sort((a,b)=>parseInt(String(a.id).replace("EX",""),10)-parseInt(String(b.id).replace("EX",""),10));
+
+function updateCounts(){
+  countPill.textContent = `MAIN ${MAIN_PAGES.length} ・EX ${EX_PAGES.length}`;
+}
+
+function pageBadge(p){
+  return p.type === "ex"
+    ? `<span class="badge ex">EX</span>`
+    : `<span class="badge main">MAIN</span>`;
+}
+
+function escapeHtml(str){
+  return String(str)
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+}
+
+function getPositionLabel(p){
+  if(p.type === "main"){
+    const idx = MAIN_PAGES.findIndex(x => x.id === p.id);
+    return (idx >= 0) ? `${idx+1} / ${MAIN_PAGES.length}` : "-";
+  }
+  // EXは「EX母数」扱い：EX1が 1 / EX総数
+  const n = parseInt(String(p.id).replace("EX",""), 10);
+  return Number.isFinite(n) ? `EX ${n} / ${EX_PAGES.length}` : `EX ? / ${EX_PAGES.length}`;
+}
+
+function loadHistory(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    const arr = raw ? JSON.parse(raw) : [];
+    return Array.isArray(arr) ? arr : [];
+  }catch(_){ return []; }
+}
+function saveHistory(arr){
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(arr)); }catch(_){}
+}
+function formatWhen(ts){
+  const d = new Date(ts);
+  // 例: 02/05 21:34
+  const mm = String(d.getMonth()+1).padStart(2,"0");
+  const dd = String(d.getDate()).padStart(2,"0");
+  const hh = String(d.getHours()).padStart(2,"0");
+  const mi = String(d.getMinutes()).padStart(2,"0");
+  return `${mm}/${dd} ${hh}:${mi}`;
+}
+function renderHistory(){
+  const hist = loadHistory();
+  historyEl.innerHTML = "";
+  if(hist.length === 0){
+    const e = document.createElement("div");
+    e.className = "empty";
+    e.textContent = "まだ履歴はありません。ページを開くと記録されます。";
+    historyEl.appendChild(e);
+    return;
+  }
+  hist.forEach(h => {
+    const p = PAGES.find(x => x.id === h.id);
+    if(!p) return;
+    const el = document.createElement("div");
+    el.className = "histItem";
+    el.innerHTML = `
+      <div class="histTop">
+        <div class="small"><strong>${p.id}</strong> — ${escapeHtml(p.title)}</div>
+        <div class="histWhen">${formatWhen(h.at)}</div>
+      </div>
+      <div class="small" style="margin-top:6px; color: rgba(148,163,184,.85);">
+        keyword: ${escapeHtml(p.keywords.join(" / "))}
+      </div>
+    `;
+    el.addEventListener("click", () => openPage(p, {fromHistory:true}));
+    historyEl.appendChild(el);
+  });
+}
+
+function pushHistory(id){
+  const now = Date.now();
+  let hist = loadHistory();
+  // 既存の同IDは消して先頭へ
+  hist = hist.filter(x => x.id !== id);
+  hist.unshift({id, at: now});
+  hist = hist.slice(0, HISTORY_MAX);
+  saveHistory(hist);
+  renderHistory();
+}
+
+function openPage(p, opts={}){
+  viewPill.textContent = `${p.id} / ${p.title}`;
+  posPill.textContent = getPositionLabel(p);
+
+  viewer.innerHTML = `
+    <h2 class="docTitle">${escapeHtml(p.title)}</h2>
+    <div class="docMeta">
+      <span class="meta">ID: ${escapeHtml(p.id)}</span>
+      <span class="meta">TYPE: ${escapeHtml(p.type.toUpperCase())}</span>
+      <span class="meta">POSITION: ${escapeHtml(getPositionLabel(p))}</span>
+      <span class="meta">KEYWORD: ${escapeHtml(p.keywords.join(" / "))}</span>
+    </div>
+    <div class="doc">${escapeHtml(p.body)}</div>
+  `;
+  location.hash = encodeURIComponent(p.id);
+
+  // 履歴
+  if(!opts.fromHistory) pushHistory(p.id);
+  else pushHistory(p.id); // historyから開いても「最新」扱いにする
+}
+
+function renderResults(items, query){
+  results.innerHTML = "";
+  if(!query){
+    status.textContent = "キーワードを入力してください。";
+    return;
+  }
+  if(items.length === 0){
+    status.textContent = `「${query}」に一致するページはありません。`;
+    const el = document.createElement("div");
+    el.className = "empty";
+    el.textContent = "一致なし。表記ゆれ（全角/半角・記号・スペース）も確認してみてください。";
+    results.appendChild(el);
+    return;
+  }
+  status.textContent = `「${query}」で ${items.length} 件ヒット`;
+  items.forEach(p => {
+    const el = document.createElement("div");
+    el.className = "item";
+    el.innerHTML = `
+      <div class="top">
+        <div>
+          <div class="id">${escapeHtml(p.id)}</div>
+          <div class="kw">keyword: ${escapeHtml(p.keywords.join(" / "))}</div>
+        </div>
+        ${pageBadge(p)}
+      </div>
+      <div class="title">${escapeHtml(p.title)}</div>
+    `;
+    el.addEventListener("click", () => openPage(p));
+    results.appendChild(el);
+  });
+}
+
+function search(){
+  const query = normalize(q.value);
+  const hits = PAGES.filter(p => p.keywords.some(kw => normalize(kw) === query));
+  hits.sort((a,b) => {
+    if(a.type !== b.type) return a.type === "main" ? -1 : 1;
+    const ax = a.id.startsWith("EX"), bx = b.id.startsWith("EX");
+    if(ax && bx) return parseInt(a.id.slice(2),10) - parseInt(b.id.slice(2),10);
+    if(!ax && !bx) return parseInt(a.id,10) - parseInt(b.id,10);
+    return a.id.localeCompare(b.id, "ja");
+  });
+  renderResults(hits, query);
+}
+
+btn.addEventListener("click", search);
+q.addEventListener("keydown", (e)=>{ if(e.key==="Enter") search(); });
+
+clearHistBtn.addEventListener("click", ()=>{
+  try{ localStorage.removeItem(STORAGE_KEY); }catch(_){}
+  renderHistory();
+});
+
+(function init(){
+  updateCounts();
+  renderHistory();
+
+  const id = decodeURIComponent((location.hash || "").replace(/^#/, ""));
+  if(id){
+    const p = PAGES.find(x => x.id === id);
+    if(p) openPage(p);
+  }
+})();
+</script>
+</body>
+</html>
