@@ -1,4 +1,4 @@
-# Sea&Bunny殺人事件（ARG）
+# Sea&Bunny殺人事件
 
 ## 件名：Sea&Bunny 事故に関する調査協力のお願い  
 **差出人：遥月 凪紗（Sea&Beluga 店長）**
