@@ -491,6 +491,7 @@ const PAGES = [
 さらに追記（別筆跡）
 - 「野月、覗いたっぽい」`},
   { id:"20", type:"main", title:"くしゃくしゃに丸められたメモ", keywords:["陽夏"], body:`タイトル：テラスの手すり（B）
+（陽夏のメモ）
 
 七瀬さんのログ見た。
 B、やっぱ揺れてる扱いなんすねぇ。
@@ -585,6 +586,7 @@ B、やっぱ揺れてる扱いなんすねぇ。
 だから、余計に分かんない。
 この店で“普通”をやれって言われるのが、一番むずい。`},
   { id:"27", type:"main", title:"（写し）陽夏メモ（完全版）", keywords:["しゃぼん柄のメモ帳 くしゃくしゃに丸められたメモ","くしゃくしゃに丸められたメモ しゃぼん柄のメモ帳","しゃぼん柄のメモ帳　くしゃくしゃに丸められたメモ","くしゃくしゃに丸められたメモ　しゃぼん柄のメモ帳"], body:`タイトル：テラスの手すり（B）
+（陽夏のメモ）
 
 七瀬さんのログ見た。
 B、やっぱ揺れてる扱いなんすねぇ。
@@ -794,9 +796,27 @@ const historyEl = $("#history");
 const clearHistBtn = $("#clearHist");
 
 function normalize(s){ return (s ?? "").trim(); }
+function normalizeKey(s){
+  // NFKCで全角英数などを寄せ、空白（全角/半角/連続）を1つに統一
+  return (s ?? "")
+    .toString()
+    .normalize("NFKC")
+    .replace(/\u3000/g, " ")
+    .replace(/[\t\n\r]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+function tokenSig(s){
+  const t = normalizeKey(s).split(" ").filter(Boolean).sort();
+  return t.join(" ");
+}
+
 
 const MAIN_PAGES = PAGES.filter(p => p.type === "main").slice().sort((a,b)=>parseInt(a.id,10)-parseInt(b.id,10));
 const EX_PAGES = PAGES.filter(p => p.type === "ex").slice().sort((a,b)=>parseInt(String(a.id).replace("EX",""),10)-parseInt(String(b.id).replace("EX",""),10));
+
+
+let lastQueryNorm = "";
 
 function updateCounts(){
   countPill.textContent = `MAIN ${MAIN_PAGES.length} ・EX ${EX_PAGES.length}`;
@@ -859,6 +879,10 @@ function renderHistory(){
   hist.forEach(h => {
     const p = PAGES.find(x => x.id === h.id);
     if(!p) return;
+
+    // 履歴に表示するのは「そのとき入力した検索語」優先。なければ代表キー（先頭）だけ。
+    const shown = h.q ? h.q : (p.primaryKeyword ? p.primaryKeyword : (p.keywords && p.keywords[0] ? p.keywords[0] : ""));
+
     const el = document.createElement("div");
     el.className = "histItem";
     el.innerHTML = `
@@ -867,20 +891,23 @@ function renderHistory(){
         <div class="histWhen">${formatWhen(h.at)}</div>
       </div>
       <div class="small" style="margin-top:6px; color: rgba(148,163,184,.85);">
-        keyword: ${escapeHtml(p.keywords.join(" / "))}
+        input: ${escapeHtml(shown)}
       </div>
     `;
-    el.addEventListener("click", () => openPage(p, {fromHistory:true}));
+    el.addEventListener("click", () => openPage(p, {fromHistory:true, query: shown}));
     historyEl.appendChild(el);
   });
 }
 
-function pushHistory(id){
+
+function pushHistory(id, q){
   const now = Date.now();
   let hist = loadHistory();
   // 既存の同IDは消して先頭へ
   hist = hist.filter(x => x.id !== id);
-  hist.unshift({id, at: now});
+  const entry = { id, at: now };
+  if(q) entry.q = q;
+  hist.unshift(entry);
   hist = hist.slice(0, HISTORY_MAX);
   saveHistory(hist);
   renderHistory();
@@ -902,26 +929,26 @@ function openPage(p, opts={}){
   `;
   location.hash = encodeURIComponent(p.id);
 
-  // 履歴
-  if(!opts.fromHistory) pushHistory(p.id);
-  else pushHistory(p.id); // historyから開いても「最新」扱いにする
+  const qForHist = (opts && opts.query) ? opts.query : null;
+  // historyから開いても「最新」扱い
+  pushHistory(p.id, qForHist);
 }
 
-function renderResults(items, query){
+function renderResults(items, queryNorm){
   results.innerHTML = "";
-  if(!query){
+  if(!queryNorm){
     status.textContent = "キーワードを入力してください。";
     return;
   }
   if(items.length === 0){
-    status.textContent = `「${query}」に一致するページはありません。`;
+    status.textContent = `「${queryNorm}」に一致するページはありません。`;
     const el = document.createElement("div");
     el.className = "empty";
     el.textContent = "一致なし。表記ゆれ（全角/半角・記号・スペース）も確認してみてください。";
     results.appendChild(el);
     return;
   }
-  status.textContent = `「${query}」で ${items.length} 件ヒット`;
+  status.textContent = `「${queryNorm}」で ${items.length} 件ヒット`;
   items.forEach(p => {
     const el = document.createElement("div");
     el.className = "item";
@@ -935,14 +962,28 @@ function renderResults(items, query){
       </div>
       <div class="title">${escapeHtml(p.title)}</div>
     `;
-    el.addEventListener("click", () => openPage(p));
+    el.addEventListener("click", () => openPage(p, { query: lastQueryNorm }));
     results.appendChild(el);
   });
 }
 
 function search(){
-  const query = normalize(q.value);
-  const hits = PAGES.filter(p => p.keywords.some(kw => normalize(kw) === query));
+  const queryNorm = normalizeKey(q.value);
+  lastQueryNorm = queryNorm;
+
+  const qSig = tokenSig(queryNorm);
+
+  const hits = PAGES.filter(p => (p.keywords || []).some(kw => {
+    const kn = normalizeKey(kw);
+    if(kn === queryNorm) return true;
+
+    // 複数語の場合、順不同も許可（トークン集合一致）
+    if(queryNorm.includes(" ") || kn.includes(" ")){
+      return tokenSig(kn) === qSig;
+    }
+    return false;
+  }));
+
   hits.sort((a,b) => {
     if(a.type !== b.type) return a.type === "main" ? -1 : 1;
     const ax = a.id.startsWith("EX"), bx = b.id.startsWith("EX");
@@ -950,7 +991,7 @@ function search(){
     if(!ax && !bx) return parseInt(a.id,10) - parseInt(b.id,10);
     return a.id.localeCompare(b.id, "ja");
   });
-  renderResults(hits, query);
+  renderResults(hits, queryNorm);
 }
 
 btn.addEventListener("click", search);
